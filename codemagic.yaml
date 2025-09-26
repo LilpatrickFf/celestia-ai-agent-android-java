@@ -1,0 +1,43 @@
+workflows:
+  android-build:
+    name: Android Build
+    environment:
+      vars:
+        CM_JAVA_VERSION: 17
+        CM_ANDROID_SDK_BUILD_TOOLS: 34.0.0
+        CM_ANDROID_SDK_PLATFORM: 34
+      android:
+        # Add any specific Android environment variables if needed
+    trigger:
+      branch:
+        - master
+    scripts:
+      - name: Set up Java
+        script: | 
+          sdk install java $CM_JAVA_VERSION
+          sdk use java $CM_JAVA_VERSION
+      - name: Set up Android SDK
+        script: | 
+          sdk install android $CM_ANDROID_SDK_BUILD_TOOLS
+          sdk use android $CM_ANDROID_SDK_BUILD_TOOLS
+          sdk install android $CM_ANDROID_SDK_PLATFORM
+          sdk use android $CM_ANDROID_SDK_PLATFORM
+      - name: Get Flutter packages
+        script: | 
+          # This project is native Android, so no Flutter packages needed
+          # If this were a Flutter project, this step would be 'flutter pub get'
+      - name: Build Android app
+        script: | 
+          ./gradlew assembleRelease
+    artifacts:
+      - app/build/outputs/**/*.apk
+      - app/build/outputs/**/*.aab
+    publishing:
+      email:
+        recipients:
+          - user@example.com # Replace with actual recipient
+        success:
+          - attachments
+        failure:
+          - attachments
+
